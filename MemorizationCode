@@ -1,0 +1,263 @@
+#include <Adafruit_BMP280.h>
+
+#include <Adafruit_GFX.h>
+#include <Adafruit_TFTLCD.h>
+#include <TouchScreen.h>
+
+#define LCD_CS A3
+#define LCD_CD A2
+#define LCD_WR A1
+#define LCD_RD A0
+#define YP A3
+#define XM A2
+#define YM 9
+#define XP 8
+#define LCD_RESET A4
+#define BLACK       0x0000
+#define BLUE        0x001F
+#define RED         0xF800
+#define GREEN       0x07E0
+#define CYAN        0x07FF
+#define MAGENTA     0xF81F
+#define YELLOW      0xFFE0
+#define WHITE       0xFFFF
+#define ORANGE      0xFD20
+#define GREENYELLOW 0xAFE5
+#define NAVY        0x000F
+#define DARKGREEN   0x03E0
+#define DARKCYAN    0x03EF
+#define MAROON      0x7800
+#define PURPLE      0x780F
+#define OLIVE       0x7BE0
+#define LIGHTGREY   0xC618
+#define DARKGREY    0x7BEF
+#define MINPRESSURE 10
+#define MAXPRESSURE 1000
+Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
+TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300); 
+uint16_t identifier = tft.readID();
+int sum=0;
+void random(int &a, int & b, int & c, int & d, int & e){
+  a=0 + (rand() % 9999);
+  b=0 + (rand() % 9999);
+  c=0 + (rand() % 9999);
+  d=0 + (rand() % 9999);
+  e=0 + (rand() % 9999);
+}
+class button{
+
+public:
+void printbutton(int colour,int posy,String text){
+  /*tft.fillRect(posx,posy, 130, 30, color);
+  tft.drawRect(posx,posy, 130, 30,color);*/
+  tft.fillRect(1,posy, 160, 30, colour);
+  tft.drawRect(1,posy, 160, 30,colour);
+  tft.setCursor(1,posy+10);
+  tft.setTextColor(WHITE);
+  tft.print(text);
+}
+
+
+
+};
+String shuffle(int T[]){
+  int s1=0 + (rand() % 5);
+  int s2=0 + (rand() % 5);
+  while (s2==s1){
+    s2=0 + (rand() % 5);
+  }
+  int s3=0 + (rand() % 5);
+  while (s3==s1 || s3==s2){
+    s3=0 + (rand() % 5);
+  }
+  int s4=0 + (rand() % 5);
+  while (s4==s3 || s4==s2 || s4==s1){
+    s4=0 + (rand() % 5);
+  }
+  int s5=0 + (rand() % 5);
+  while (s5==s1 || s5==s2 || s5==s3 || s5==s4){
+    s5=0 + (rand() % 5);
+  }
+  String ch3=String(T[s1]);
+  String ch4=String(T[s2]);
+  String ch5=String(T[s3]);
+  String ch6=String(T[s4]);
+  String ch7=String(T[s5]);
+
+  return ch3+"/"+ch4+"/"+ch5+"/"+ch6+"/"+ch7;
+}
+bool present(String T[],int size, String x){
+  bool test=false;
+  for (int i=0; i<size; i++){
+    if (T[i]==x){
+      test=true;
+    }
+  }
+  return test;
+}
+
+void setup() {
+  // put your setup code here, to run once:
+  tft.begin(identifier);
+  tft.fillScreen(RED);
+  delay(100);
+  tft.fillScreen(WHITE);
+  tft.setTextColor(NAVY);
+  tft.setCursor(40,90);
+  tft.setTextSize(1);
+  int a,b,c,d,e;
+  String T2[5];
+  // tft.println(a);
+  // tft.setCursor(40,130);
+  // tft.println(b);
+  // tft.setCursor(40,150);
+  // tft.println(c);
+  // tft.setCursor(40,170);
+  // tft.println(d);
+  // tft.setCursor(40,190);
+  // tft.println(e);
+  tft.fillScreen(WHITE);
+  int T[5];
+  
+  tft.fillScreen(WHITE);
+  for (int f=0; f<2; f++){
+    random(a,b,c,d,e);
+    T[0]=a; T[1]=b; T[2]=c; T[3]=d; T[4]=e;
+    String ch=shuffle(T);
+    for (int i=0; i<4; i++){
+      tft.setCursor(30,90);
+      T2[i]=shuffle(T); // we shuffle every 
+      while (T2[i]==ch){
+        T2[i]=shuffle(T);
+      }
+    }
+    tft.fillScreen(WHITE);
+    delay(1000);
+    tft.setCursor(10,90);
+    tft.setTextSize(1.8);
+    tft.println("This is the right sequence of numbers. \n Keep it in mind");
+    tft.setCursor(30,150);
+    tft.setTextColor(BLUE);
+    tft.setTextSize(1.9);
+    tft.print(ch);
+    delay(3000);
+    tft.fillScreen(WHITE);
+    tft.setCursor(40,80);
+    tft.setTextColor(RED);
+    tft.setTextSize(1.5);
+    tft.println("Here are your choices. \n ");
+    tft.setCursor(40,100);
+    tft.setTextColor(RED);
+    tft.setTextSize(1.5);
+    tft.println("Remember your right order");
+    delay(2000);
+    tft.fillScreen(WHITE);
+    tft.setCursor(30,90);
+    tft.setTextColor(NAVY);
+    tft.setTextSize(2);
+    int C[5]={RED,BLUE,GREEN,MAROON,PURPLE};
+    int Y_cord[5]={115,145,175,205,235};
+    int m=0;
+    button B[5];
+    for (int k=0; k<5; k++){
+      if (k==(f%5)){
+        tft.setTextColor(NAVY);
+        tft.setTextSize(1);
+        B[m].printbutton(C[m],Y_cord[m],ch);
+        m=m+1;
+        delay(1000);
+        B[m].printbutton(C[m],Y_cord[m],T2[k]);
+        delay(1000);
+        m=m+1;
+      }
+      else{
+        tft.setCursor(30,90+(10*(m+1)));
+        tft.setTextColor(NAVY);
+        tft.setTextSize(1);
+        B[m].printbutton(C[m],Y_cord[m],T2[k]);
+        m=m+1;
+        delay(1000);
+        }
+      }
+      int time1=millis();
+      int n;
+      while (millis()-time1<2500){
+         n=getval();
+         if (n>0){
+           break;
+         }
+      }
+      if (n=f%5){
+        sum=sum+1;
+      }
+      tft.fillScreen(WHITE);
+      tft.setCursor(30,90);
+      tft.setTextColor(NAVY);
+      tft.setTextSize(1);
+      delay(1500);
+    }
+    tft.fillScreen(WHITE);
+    tft.setCursor(40,130);
+    tft.setTextSize(3);
+    tft.setTextColor(NAVY);
+    tft.println("You got a");
+    tft.setCursor(40,160);
+    tft.println("score of");
+    tft.setCursor(120,200);
+    tft.print(sum);
+  }
+  
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+}
+bool touchedWithin(TSPoint touch, unsigned x,unsigned w, unsigned y, unsigned h)
+{
+  return (touch.x > x) && (touch.x < (w)) && (touch.y > y) && (touch.y < (h));
+}
+void printn(int x){           
+  tft.setCursor(10 + 2, 10+10);
+  tft.setTextColor(WHITE, BLACK);
+  tft.setTextSize(1);
+  tft.print(x);} 
+int getval(){
+    int n=0;
+    TSPoint p = ts.getPoint();
+     pinMode(XM,OUTPUT);
+     pinMode(YP,OUTPUT);
+    
+    if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
+
+       if(touchedWithin(p,183,623,464,522)){//NV
+          n=n+5;
+          printn(n);
+          //i2comm(n);
+     }
+         else
+       if(touchedWithin(p,193,620,374,434)){//ALMN
+         n=n+4;
+         printn(n);
+         //i2comm(n);
+     }   else
+       if(touchedWithin(p,202,611,283,336)){//OFT
+          n=n+3;
+          printn(n);
+          //i2comm(n);
+     }   else
+       if(touchedWithin(p,203,618,185,246)){//SOMT
+          n=n+2;
+          printn(n);
+          //i2comm(n);
+     }   else
+      if(touchedWithin(p,196,622,91,146)){//A ATT
+          n=n+1;//
+          printn(n);
+          //i2comm(n);
+     }  else n=n;
+     printn(n);
+     //i2comm(n);
+   }
+   
+      return n;
+  }
