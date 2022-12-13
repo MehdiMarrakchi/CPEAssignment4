@@ -1,0 +1,298 @@
+#include <Adafruit_GFX.h>
+#include <Adafruit_TFTLCD.h>
+#include <stdint.h>
+#include <Wire.h>
+#include <TouchScreen.h>
+#include <Fonts/FreeSerif9pt7b.h>
+#include <Fonts/FreeMonoBoldOblique12pt7b.h>
+void random(String T2[10]);
+#define LCD_CS A3 
+#define LCD_CD A2 
+#define LCD_WR A1 
+#define LCD_RD A0 
+#define LCD_RESET A4 
+#define BLACK       0x0000      /*   0,   0,   0 */
+#define NAVY        0x000F      /*   0,   0, 128 */
+#define DARKGREEN   0x03E0      /*   0, 128,   0 */
+#define DARKCYAN    0x03EF      /*   0, 128, 128 */
+#define MAROON      0x7800      /* 128,   0,   0 */
+#define PURPLE      0x780F      /* 128,   0, 128 */
+#define OLIVE       0x7BE0      /* 128, 128,   0 */
+#define LIGHTGREY   0xC618      /* 192, 192, 192 */
+#define DARKGREY    0x7BEF      /* 128, 128, 128 */
+#define BLUE        0x001F      /*   0,   0, 255 */
+#define GREEN       0x07E0      /*   0, 255,   0 */
+#define CYAN        0x07FF      /*   0, 255, 255 */
+#define RED         0xF800      /* 255,   0,   0 */
+#define MAGENTA     0xF81F      /* 255,   0, 255 */
+#define YELLOW      0xFFE0      /* 255, 255,   0 */
+#define WHITE       0xFFFF      /* 255, 255, 255 */
+#define ORANGE      0xFD20      /* 255, 165,   0 */
+#define GREENYELLOW 0xAFE5      /* 173, 255,  47 */
+#define PINK        0xF81F
+
+#define YP A3
+#define XM A2
+#define YM 9
+#define XP 8
+#define TS_MINX 120
+#define TS_MINY 111
+#define TS_MAXX 942
+#define TS_MAXY 890
+#define MINPRESSURE 7
+#define MAXPRESSURE 1000
+boolean buttonEnabled = true;
+Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
+TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
+uint16_t identifier = tft.readID();//function reads ID from the display and put it in ID variable
+
+class button{
+
+public:
+void printbutton(int colour,int posy,String text){
+  /*tft.fillRect(posx,posy, 130, 30, color);
+  tft.drawRect(posx,posy, 130, 30,color);*/
+  tft.fillRect(20,posy, 130, 30, colour);
+  tft.drawRect(20,posy, 130, 30,colour);
+  tft.setCursor(30,posy+10);
+  tft.setTextColor(NAVY);
+  tft.print(text);
+}
+
+
+
+};
+int C[5]={GREEN,YELLOW,BLUE,YELLOW,RED};
+int Y_cord[5]={140,175,210,245,280};
+String Txt[5]={{"N"},{"AMAZ"},{"LISA"},{"CONA"},{"MEHDI"}};
+
+String Z[10]={{"I feel in control of important things   in my life"},
+    {"I feel stressed lately"},
+    {"I am preparing for an important test/  job"},{"I have time to hang out with my         friends"},{"I struggle with sleep"},{"I feel safe in my surrounding"},{"I am fighting an addiction"},{"I get upset easily"},{"My friends know when I am stressed"},{"I feel overwhelmed when I think about   my classes, job and or physical health"
+    } };
+String R[10]={{"Congradulations on maintainind good health"},{"Set sometime to rest."},{"Excersice, sleep and have balanced meals always."},{"Take breaks from reading."},{"Selfcare-healthy diet,exercise,sleep"},{"Make time to unwind."},{"Talk to others."},{"Avoid drugs and alcohol."},{"Recognize when you need more  help."} };
+
+  
+
+button B[5]; 
+int n, sum(0);
+void setup() {
+  Wire.begin(); // join I2C bus (address optional for master)
+  tft.begin(identifier);//gets ID and the LCD gets ready to work.
+  tft.fillScreen(PURPLE);
+  tft.setTextColor(WHITE);
+  tft.setCursor(40,150);
+  tft.setTextSize(4);
+  tft.setFont(&FreeMonoBoldOblique12pt7b);
+  tft.print("NYU");
+  delay(3000);
+  
+  
+  tft.setFont();
+  for (int i=20;i<=200;){
+    tft.fillRect(20, 40, i, 20, BLUE);
+    tft.setCursor(20,60);
+    tft.setTextSize(1.5);
+    tft.print("Loading New Test...");
+   delay(1000);
+   i=i+20;
+   }
+   tft.fillScreen(PURPLE);
+  tft.setTextColor(WHITE);
+  tft.setCursor(40,150);
+  tft.setTextSize(2);
+  tft.print("READY...");
+  tft.setCursor(10,285);
+  tft.setCursor(30,285);
+  tft.setTextSize(1.5);
+  tft.print("START>>");
+  int v=getval();
+  while(v==0){
+       v=getval();
+     }
+  delay(2000);
+  tft.setFont();
+  delay(1000);
+  tft.fillScreen(WHITE);
+  tft.drawRect(0,0,319,130,RED);
+  for(int i=0;i<5;i++){
+  B[i].printbutton(C[i],Y_cord[i],Txt[i]);
+    }
+    
+  tft.setTextColor(NAVY);
+  tft.setCursor(10,40);
+  for(int i=0;i<10;i++) {
+    tft.setCursor(10,40);
+    tft.setTextSize(1.5);
+    tft.print(Z[i]);
+     n=getval();
+     while(n==0){
+       n=getval();
+     }
+     //i2comm(n);
+     sum=sum+n;
+     set();
+    //Wire.endTransmission();
+     //if(i==5||i==10){random(n);
+     //}
+     //set();
+    //
+    }
+    tft.fillScreen(WHITE);
+    tft.setCursor(10,150);
+    tft.setTextSize(1.5);
+    tft.print("Recommendations: ");
+    distr();
+    //i2comm(sum);
+}
+
+
+void loop(void) {
+ 
+}
+ 
+ 
+
+bool touchedWithin(TSPoint touch, unsigned x,unsigned w, unsigned y, unsigned h)
+{
+  return (touch.x > x) && (touch.x < (w)) && (touch.y > y) && (touch.y < (h));
+}
+
+int random(int n) {
+   int s; int x;
+  s = 1 + (rand() % (10 - 1 + 1));
+  tft.println ( Z[s]);
+  x=getval();
+     while(n==0){
+       x=getval();
+   }
+   if(x==n){sum=sum+5;}
+    else {sum=sum-5;}
+}
+void printn(int x){           
+  tft.setCursor(10 + 2, 10+10);
+  tft.setTextColor(WHITE, BLACK);
+  tft.setTextSize(1);
+  tft.print(x);} 
+
+void set(){
+  
+  tft.fillScreen(WHITE);
+  tft.setTextColor(NAVY);
+  tft.setCursor(10,40);
+  tft.drawRect(0,0,319,130,RED);
+  for(int i=0;i<5;i++){
+  B[i].printbutton(C[i],Y_cord[i],Txt[i]);
+  tft.setTextColor(NAVY);
+  tft.setCursor(10,40);
+}
+}
+void complete(){
+  tft.fillScreen(WHITE);
+  tft.setTextColor(NAVY);
+  tft.setCursor(40,100);
+  tft.print(F("TEST COMPLETE!\n Your scrore is: "));
+  tft.print(sum);  
+}
+  int getval(){
+    int n=0;
+    TSPoint p = ts.getPoint();
+     pinMode(XM,OUTPUT);
+     pinMode(YP,OUTPUT);
+    
+    if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
+
+       if(touchedWithin(p,183,623,464,522)){//NV
+          n=n+5;
+          printn(n);
+          //i2comm(n);
+     }
+         else
+       if(touchedWithin(p,193,620,374,434)){//ALMN
+         n=n+4;
+         printn(n);
+         //i2comm(n);
+     }   else
+       if(touchedWithin(p,202,611,283,336)){//OFT
+          n=n+3;
+          printn(n);
+          //i2comm(n);
+     }   else
+       if(touchedWithin(p,203,618,185,246)){//SOMT
+          n=n+2;
+          printn(n);
+          //i2comm(n);
+     }   else
+      if(touchedWithin(p,196,622,91,146)){//A ATT
+          n=n+1;//
+          printn(n);
+          //i2comm(n);
+     }  else n=n;
+     printn(n);
+     //i2comm(n);
+   }
+   
+      return n;
+  }
+  void i2comm(int x){
+    Wire.beginTransmission(8); // transmit to device #8
+    Wire.write(x);     // sends one byte
+    Wire.endTransmission();    // stop transmitting
+  }
+  void printrecH(){
+    tft.setCursor(20,110);
+    tft.setTextSize(1.5);
+    tft.setCursor(00,160);
+    for(int i=1;i<10;i++){tft.print( R[i]);tft.print('\n');}
+  }
+  void printrecML(){
+    tft.setCursor(20,110);
+    tft.setTextSize(1.5);
+    tft.setCursor(00,160);
+    for(int i=0;i<3;i++){tft.print(R[i]);tft.print('\n');}
+  }
+   void distr(){
+    int w=(sum*6.4);
+    tft.setCursor(20,110);
+    tft.setTextSize(1.5);
+    tft.print(F("SCORE: "));
+    tft.setCursor(40,130);
+    tft.setTextColor(NAVY);
+    tft.setTextSize(3);
+    tft.print(sum);
+    tft.drawRect(0,20,319,70,RED);
+    tft.fillRect(0,20,319,70,PINK);
+    if(sum<20){tft.fillRect(00, 20, w,  70, RED);
+    tft.setCursor(40,150);printrecH();printpercent(w);}
+        else if(sum>=20&&sum<30){tft.fillRect(00, 20, w, 70, BLUE);
+        tft.setCursor(40,150);printrecH();printpercent(w);}
+          else if(sum>=30&&sum<40){tft.fillRect(00, 20, w, 70, YELLOW);
+          tft.setCursor(40,150);printrecML();printpercent(w);}
+            else if(sum>=40&&sum<60){tft.fillRect(00, 20, w, 70, GREEN);
+            tft.setCursor(40,150);printrecML();printpercent(w);}
+   }
+  
+void printpercent(int m){
+    int p=m*0.3125;
+    tft.setCursor(20,50);
+    tft.setTextSize(1.5);
+    tft.setTextColor(NAVY);
+    tft.print(p);tft.print(" %");
+    if(m<280){
+    tft.setCursor(190,50);
+    tft.print(100-p);tft.print(" %");
+    }
+  
+    
+}
+   /*for (int i=0;i<10;i++){
+     tft.setCursor(10,40);
+     if(i==4||i==10){
+       random(Z);
+     }else
+     tft.print(Z[i]);
+     
+     tft.fillRect(0, 0, 319, 130,buttoncolors[i]);
+     
+     
+   }*/
