@@ -1,0 +1,107 @@
+#include <Wire.h>
+
+
+int sum(0);
+void setup(){
+  Wire.begin(8);                // join I2C bus with address #8
+  Wire.onRequest(onrequestEvent); // register event
+
+  //TEST 3 SEPARARTE ARDUINO
+
+  tft.println("1: So I decided to have a walk on the near park to clear my mind\n  2: To watch a vlog on Youtube \n 3: To have a nap because I felt sleepy");
+    
+
+
+    tft.println("After that, my brother told me that he was hungry...\n\n");
+    tft.println("1: So I suggested cooking together his favorite meal because I enjoy my time with him\n 2: I decided to cook something quick for him because I had no energy to deal with him\n  3: I ordered food for him because I had no time");
+    
+
+
+    tft.println("After the meal, I needed to finish my last assignment but felt a bit unmotivated ...\n\n");
+    tft.println( "1: So I decided to go study with my brother so that we motivate each other\n  2: I played my favorite playlist and started doing the work, can't waiting for it to end\n  3: I decided not to do it because it is annoying"); 
+    
+
+
+
+    tft.println("I heard some noise outside, so I decided to see what is happening from the window, it was my neighbors...\n\n" );
+    tft.println("1: So I opened the window and said Hey to them while smiling\n  2: I stayed a quick Hey because they have already seen me\n   3: I pretended not having seen them because this was the last thing I needed to do");
+    
+
+
+    tft.println("\nWhile looking at the window, my eyes came across my calculator, and I remembered about the math quiz I had the following day: I had completely forgotten about it...\n\n");
+    tft.println("1: So I decided not to freak out because I am good at math\n 2: I got pretty anxious because I did not do enough revision for it\n  3: I was so stressed that I began to imagine getting an F on this test");
+    
+
+
+    tft.println("Here, my parents came back from work, ... ");
+    tft.println("1: So I decided to go spend some time with them and then come work on math\n  2: I went say a quick hey because I had much to do \n    3: I decided to say hey from my bedroom because I was counting the seconds");
+    
+
+
+    tft.println("\nwhile revising I found that I, ... \n\n" );
+    tft.println("1: knew the majority of the content, so I got confident\n  2: knew some content, but still was stressed because of what I did not master\n 3: knew nothing, it felt like I did not attend all this morning's lectures" );
+    
+  
+}
+
+void loop(){
+  delay(100);
+}
+
+// function that executes whenever data is requested by master
+// this function is registered as an event, see setup()
+void onrequestEvent() {
+  Wire.write(sum); // respond with message of 8 bytes
+  // as expected by master
+}
+
+int getval(){
+    int n=0;
+    TSPoint p = ts.getPoint();
+     pinMode(XM,OUTPUT);
+     pinMode(YP,OUTPUT);
+    
+    if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
+
+       if(touchedWithin(p,183,623,464,522)){//NV
+          n=n+5;
+          printn(n);
+          //i2comm(n);
+     }
+         else
+       if(touchedWithin(p,193,620,374,434)){//ALMN
+         n=n+4;
+         printn(n);
+         //i2comm(n);
+     }   else
+       if(touchedWithin(p,202,611,283,336)){//OFT
+          n=n+3;
+          printn(n);
+          //i2comm(n);
+     }   else
+       if(touchedWithin(p,203,618,185,246)){//SOMT
+          n=n+2;
+          printn(n);
+          //i2comm(n);
+     }   else
+      if(touchedWithin(p,196,622,91,146)){//A ATT
+          n=n+1;//
+          printn(n);
+          //i2comm(n);
+     }  else n=n;
+     printn(n);
+     //i2comm(n);
+   }
+   
+      return n;
+  }
+  void printn(int x){           
+  tft.setCursor(10 + 2, 10+10);
+  tft.setTextColor(WHITE, BLACK);
+  tft.setTextSize(1);
+  tft.print(x);} 
+
+  bool touchedWithin(TSPoint touch, unsigned x,unsigned w, unsigned y, unsigned h)
+{
+  return (touch.x > x) && (touch.x < (w)) && (touch.y > y) && (touch.y < (h));
+}
