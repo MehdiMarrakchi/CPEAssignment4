@@ -1,0 +1,134 @@
+#include <Adafruit_BMP280.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_TFTLCD.h>
+#include <TouchScreen.h>
+#define LCD_CS A3
+#define LCD_CD A2
+#define LCD_WR A1
+#define LCD_RD A0
+#define YP A3
+#define XM A2
+#define YM 9
+#define XP 8
+#define LCD_RESET A4
+#define BLACK       0x0000
+#define BLUE        0x001F
+#define RED         0xF800
+#define GREEN       0x07E0
+#define CYAN        0x07FF
+#define MAGENTA     0xF81F
+#define YELLOW      0xFFE0
+#define WHITE       0xFFFF
+#define ORANGE      0xFD20
+#define GREENYELLOW 0xAFE5
+#define NAVY        0x000F
+#define DARKGREEN   0x03E0
+#define DARKCYAN    0x03EF
+#define MAROON      0x7800
+#define PURPLE      0x780F
+#define OLIVE       0x7BE0
+#define LIGHTGREY   0xC618
+#define DARKGREY    0x7BEF
+#define MINPRESSURE 10
+#define MAXPRESSURE 1000
+
+#define TS_MINX 122
+#define TS_MINY 111
+#define TS_MAXX 942
+#define TS_MAXY 890
+
+Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
+TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300); 
+uint16_t identifier = tft.readID();
+
+String T[5]={{"1 "},{"2 "},{"3 "},{"4 "},{"5 "}};
+String T2[8]={{"BLUE"}, {"YELLOW"}, {"RED"}, {"BLACK"}, {"WHITE"}, {"MAROON"}, {"ORANGE"}, {"GREEN"}};
+int T3[8]={BLUE, YELLOW, RED, BLACK, WHITE, MAROON,ORANGE, GREEN};
+int sum=0;
+
+class button{
+
+public:
+void printbutton(int colour,int posy,String text){
+  /*tft.fillRect(posx,posy, 130, 30, color);
+  tft.drawRect(posx,posy, 130, 30,color);*/
+  tft.fillRect(50,posy, 160, 30, colour);
+  tft.drawRect(50,posy, 160, 30,colour);
+  tft.setCursor(80,posy+10);
+  tft.setTextColor(WHITE);
+  tft.setTextSize(2);
+  tft.print(text);
+}
+
+
+
+};
+void setup() {
+  bool buttonEnabled = true;
+  tft.begin(identifier);
+  tft.setCursor(50,150);
+  int f,d;
+  button B;
+  for( int i=0;i<6;i++)
+  {
+    int u=0;
+    tft.setCursor(50,150);
+    f=0 + (rand() % 8);
+    d=0 + (rand() % 8);
+    //cursor=cursor+30;
+    tft.setTextSize(4);
+    tft.setTextColor(NAVY);
+    tft.fillScreen(T3[d]);
+    delay(100);
+    tft.print(T2[f]);
+    B.printbutton(CYAN,250,"YES");
+    unsigned time1=millis(); 
+                                    
+    while (millis()-time1<800)
+    {
+      sum=getval(buttonEnabled);
+      buttonEnabled=false;
+    }
+    buttonEnabled = true;
+  }
+    tft.fillScreen(WHITE);
+    tft.setCursor(40,130);
+    tft.setTextSize(3);
+    tft.setTextColor(NAVY);
+    tft.println("You got a");
+    tft.setCursor(40,160);
+    tft.println("score of");
+    tft.setCursor(120,200);
+    tft.print(sum);
+  }
+bool touchedWithin(TSPoint touch, unsigned x,unsigned w, unsigned y, unsigned h)
+{
+  return (touch.x > x) && (touch.x < (w)) && (touch.y > y) && (touch.y < (h));
+}
+
+int getval(bool x){
+  int sum=0;
+    TSPoint p = ts.getPoint();
+     pinMode(XM,OUTPUT);
+     pinMode(YP,OUTPUT);
+    
+    if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
+
+       if(touchedWithin(p,50,160,250,30)){//NV
+          sum=sum+5;
+
+          //printn(n);
+          //i2comm(n);
+     }
+      else sum=sum;
+   }
+   
+  return sum;
+  }
+void loop(){
+
+
+}
+  
+
+
